@@ -1,0 +1,58 @@
+SANADIYA - VERSION WEB INSTALLABLE (BÊTA PERSONNELLE)
+=====================================================
+
+Contenu du dossier
+- index.html ............ l'application
+- manifest.webmanifest .. nom, couleurs et icônes pour l'installation sur téléphone
+- sw.js ................. fonctionnement hors ligne
+- icon-*.png, icon.svg .. icônes Sanadiya
+
+Ne renommez pas ces fichiers et gardez-les ensemble dans le même dossier.
+
+
+1. METTRE EN LIGNE (une seule des deux solutions)
+-------------------------------------------------
+
+Solution A - Netlify (la plus simple)
+  1. Créez un compte gratuit sur netlify.com.
+  2. « Add new site » > « Deploy manually ».
+  3. Glissez le dossier sanadiya-web (dézippé) dans la zone indiquée.
+  4. Netlify vous donne une adresse du type https://xxxx.netlify.app
+     (vous pouvez changer « xxxx » dans Site settings > Change site name).
+
+Solution B - GitHub Pages
+  1. Sur github.com, créez un dépôt (par exemple « sanadiya »).
+  2. « Add file » > « Upload files » : déposez TOUS les fichiers du dossier
+     (pas le dossier lui-même), puis « Commit changes ».
+  3. Settings > Pages > Branch : main, dossier / (root) > Save.
+  4. Après une à deux minutes : https://VOTRE-NOM.github.io/sanadiya/
+  Attention : un dépôt public est visible par tous.
+
+
+2. INSTALLER SUR LE TÉLÉPHONE
+-----------------------------
+iPhone : ouvrez l'adresse dans Safari > bouton Partager > « Sur l'écran d'accueil ».
+Android : ouvrez l'adresse dans Chrome > menu ⋮ > « Installer l'application »
+          (ou « Ajouter à l'écran d'accueil »).
+
+L'application s'ouvre alors en plein écran avec l'icône Sanadiya.
+Après une première ouverture avec internet, elle fonctionne aussi hors ligne.
+La progression (série, erreurs, objectif) reste sur le téléphone.
+
+
+3. METTRE À JOUR
+----------------
+  1. Remplacez index.html par la nouvelle version.
+  2. Dans sw.js, changez la ligne VERSION (sanadiya-v1 > sanadiya-v2, etc.).
+  3. Remettez les fichiers en ligne (Netlify : redéposez le dossier ;
+     GitHub : « Upload files » à nouveau).
+  Sur le téléphone, fermez puis rouvrez l'application (parfois deux fois).
+
+
+4. À SAVOIR
+-----------
+- En dehors de Claude, les commentaires et les fonctions qui demandent à Claude
+  ne sont pas disponibles. Le reste fonctionne.
+- Toute personne qui a l'adresse peut ouvrir l'application. Le contenu doit être
+  relu par un imam avant une diffusion plus large ; gardez l'adresse pour vous
+  et vos relecteurs pendant la bêta.
