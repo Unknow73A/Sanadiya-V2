@@ -5421,7 +5421,7 @@ function library(){
   var ctiles="<div class='needs' role='group' aria-labelledby='lib-cl'><span class='nlbl' id='lib-cl'>"+(bsl0?"Hadisi prema uzroku":"Hadiths selon la cause")+"</span>"+CAUSES.map(function(c){return "<button type='button' class='needbtn' data-cause='"+c.id+"' aria-pressed='"+(libState.cause===c.id)+"'><svg viewBox='0 0 24 24' width='28' height='28' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'>"+c.ico+"</svg><span>"+(bsl0?c.bs:c.s)+"</span></button>";}).join("")+"</div>";
   app.innerHTML="<div class='panel' style='display:flex;flex-direction:column;gap:14px'>"+
     "<div class='row' style='justify-content:space-between;align-items:center'><h2 class='sec-title'>"+T("libTitle")+"</h2><span class='row'><button class='btn alt' id='lib-back' type='button'>"+T("backBtn")+"</button><button class='btn alt' id='lib-home'>"+T("homeBtn")+"</button></span></div>"+
-    basm()+"<details class='tgrp'><summary>Test</summary><p class='lead'>"+T("libLead")+"</p></details>"+
+    basm()+"<details class='tgrp'><summary>Test</summary><p class='lead'>"+T("libLead")+"</p></details>"+"<details class='tgrp' id='hto-d'><summary>Collections en ligne (test)</summary><div id='hto'></div></details>"+
     djCard()+"<input id='lib-q' type='search' class='search' aria-label='"+T("libSearch")+"' placeholder='"+T("libPh")+"'>"+
     ttiles+ctiles+"<div class='row' role='group' aria-label='"+T("filterTheme")+"'>"+chips+"</div>"+sub+
     "<div class='row' style='align-items:center'><button class='chipbtn' id='lib-fav' aria-pressed='"+libState.fav+"'>"+T("favOnly")+"</button><span class='note' id='lib-count'></span></div><div class='row'><button class='btn' id='lib-rev' type='button'></button></div></div>"+
@@ -7226,6 +7226,58 @@ try{var tbb=document.querySelector(".tb-brand");tbb.setAttribute("role","link");
   var goHome=function(){home();window.scrollTo(0,0);};tbb.addEventListener("click",goHome);tbb.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();goHome();}});}catch(e){}
 try{if(hk0&&hk0!=="home"){navRoute(hk0);}else{history.replaceState({sn:1},"","#home");}}catch(e){}
 basmTop();tabsRender();try{new MutationObserver(tabsRender).observe(document.getElementById('app'),{childList:true});}catch(e){}
+})();
+</script>
+<script>
+(function(){
+var API="https://api.hadith.to/v1";
+var COLS=[["bukhari","Sahih al-Bukhari"],["muslim","Sahih Muslim"],["tirmidhi","Jami' at-Tirmidhi"],["nasai","Sunan an-Nasa'i"],["abudawud","Sunan Abi Dawud"],["ibnmajah","Sunan Ibn Majah"],["malik","Muwatta' Malik"],["riyad","Riyad as-Salihin"],["musnad-ahmad","Musnad Ahmad"],["nawawi40","40 hadiths d'An-Nawawi (récitation)"],["qudsi40","40 hadiths qudsi (récitation)"],["shahwaliullah40","40 de Shah Waliullah (récitation)"]];
+var st={c:"bukhari",n:1,info:{}};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function box(){return document.getElementById("hto");}
+function draw(res,msg){
+  var b=box();if(!b)return;
+  var h="<p class='note'>TEST — texte arabe seulement, aucune traduction. Rien n'est enregistré dans l'application. Licence de hadith.to non confirmée : usage de test uniquement, non validé par l'imam.</p>";
+  h+="<label>Livre <select id='hto-c'>"+COLS.map(function(c){return "<option value='"+c[0]+"'"+(c[0]===st.c?" selected":"")+">"+esc(c[1])+(st.info[c[0]]?" ("+esc(st.info[c[0]])+")":"")+"</option>";}).join("")+"</select></label> ";
+  h+="<label>N° <input id='hto-n' type='number' min='1' value='"+st.n+"' style='width:6em'></label> ";
+  h+="<button class='btn' id='hto-go'>Charger</button> <button class='btn' id='hto-prev'>←</button> <button class='btn' id='hto-next'>→</button> <button class='btn' id='hto-list'>Compter les hadiths</button>";
+  if(msg)h+="<p class='note'>"+esc(msg)+"</p>";
+  if(res){
+    h+="<div style='margin-top:10px'><p dir='rtl' lang='ar' style='font-size:1.5em;line-height:2;font-family:inherit'>"+esc(res.arabic||"(pas de texte)")+"</p>";
+    var m=res.media||{};
+    if(m.audio){h+="<audio controls preload='none' style='width:100%' src='"+esc(m.audio)+"'></audio>";}else{h+="<p class='note'>Pas d'audio pour ce hadith.</p>";}
+    var syn=null;for(var k in res){if(/synth/i.test(k)&&res[k])syn=res[k];}
+    if(m&&!syn){for(var k2 in m){if(/synth/i.test(k2)&&m[k2])syn=m[k2];}}
+    if(syn){h+="<p class='note'><b>Voix de synthèse :</b> "+esc(typeof syn==="string"?syn:JSON.stringify(syn))+"</p>";}
+    var links=[];(function w(o){if(o&&typeof o==="object"){for(var k in o){if(typeof o[k]==="string"&&/^https?:/.test(o[k])&&o[k]!==m.audio&&o[k]!==m.timings){links.push(o[k]);}else w(o[k]);}}})(res);
+    if(links.length){h+="<p class='note'>Liens de la source : "+links.slice(0,4).map(function(u){return "<a href='"+esc(u)+"' target='_blank' rel='noopener'>"+esc(u)+"</a>";}).join(" · ")+"</p>";}
+    h+="<p class='note'>"+esc(st.c)+" n° "+esc(res.record)+" — "+(m.audio?"audio dispo":"pas d'audio")+" · Source : hadith.to</p></div>";
+  }
+  b.innerHTML=h;
+}
+function load(){
+  draw(null,"Chargement…");
+  fetch(API+"/hadith/"+encodeURIComponent(st.c)+"/"+st.n).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});}).then(function(x){
+    if(!x.ok){draw(null,(x.j&&x.j.error&&x.j.error.message)||"Erreur");}else{draw(x.j,"");}
+  }).catch(function(){draw(null,"Connexion impossible à api.hadith.to. (Cela ne marche pas dans la version publiée en ligne : ouvre l'application du zip.)");});
+}
+function list(){
+  fetch(API+"/collections").then(function(r){return r.json();}).then(function(j){
+    var a=j.collections||j;var o={};
+    (Array.isArray(a)?a:Object.keys(a).map(function(k){var v=a[k];v.id=v.id||k;return v;})).forEach(function(c){var id=c.id||c.collection;var n=c.records||c.count||c.total||c.record_count;if(id&&n!=null)o[id]=n;});
+    st.info=o;draw(null,"Liste chargée : "+Object.keys(o).length+" collections.");
+  }).catch(function(){draw(null,"Connexion impossible à api.hadith.to.");});
+}
+document.addEventListener("toggle",function(e){if(e.target&&e.target.id==="hto-d"&&e.target.open){draw(null,"");}},true);
+document.addEventListener("click",function(e){
+  var t=e.target&&e.target.closest?e.target.closest("button"):null;if(!t||!box()||!box().contains(t))return;
+  var n=document.getElementById("hto-n"),c=document.getElementById("hto-c");
+  if(c)st.c=c.value;if(n)st.n=Math.max(1,parseInt(n.value,10)||1);
+  if(t.id==="hto-go")load();
+  else if(t.id==="hto-prev"){st.n=Math.max(1,st.n-1);load();}
+  else if(t.id==="hto-next"){st.n+=1;load();}
+  else if(t.id==="hto-list")list();
+});
 })();
 </script>
 
